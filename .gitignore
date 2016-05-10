@@ -1,0 +1,7 @@
+.moc
+.obj
+.pch
+lib
+plugins
+mkspecs
+Makefile*
