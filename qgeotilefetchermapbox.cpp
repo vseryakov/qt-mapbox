@@ -3,6 +3,8 @@
 ** Copyright (C) 2014 Canonical Ltd.
 ** Contact: http://www.qt.io/licensing/
 **
+** Developed by Vlad Seryakov <vseryakov@gmail.com>
+**
 ** This file is part of the QtLocation module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL3$
@@ -90,7 +92,7 @@ QGeoTiledMapReply *QGeoTileFetcherMapbox::getTileImage(const QGeoTileSpec &spec)
                         arg(m_mapId).
                         arg(spec.zoom()).
                         arg(spec.x()).
-                        arg(spec.y()). 
+                        arg(spec.y()).
                         arg(m_format.indexOf(QLatin1Char('.')) == -1 ? "." : "").
                         arg(m_format).
                         arg(m_accessToken)));

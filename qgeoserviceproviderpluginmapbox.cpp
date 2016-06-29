@@ -3,6 +3,8 @@
 ** Copyright (C) 2014 Canonical Ltd.
 ** Contact: http://www.qt.io/licensing/
 **
+** Developed by Vlad Seryakov <vseryakov@gmail.com>
+**
 ** This file is part of the QtLocation module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL3$
@@ -36,6 +38,7 @@
 
 #include "qgeoserviceproviderpluginmapbox.h"
 #include "qgeotiledmappingmanagerenginemapbox.h"
+#include "qgeoroutingmanagerenginemapbox.h"
 
 #include <QtLocation/private/qgeotiledmappingmanagerengine_p.h>
 
@@ -70,11 +73,16 @@ QGeoMappingManagerEngine *QGeoServiceProviderFactoryMapbox::createMappingManager
 QGeoRoutingManagerEngine *QGeoServiceProviderFactoryMapbox::createRoutingManagerEngine(
     const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString) const
 {
-    Q_UNUSED(parameters)
-    Q_UNUSED(error)
-    Q_UNUSED(errorString)
+    const QString accessToken = parameters.value(QStringLiteral("mapbox.access_token")).toString();
 
-    return 0;
+    if (!accessToken.isEmpty()) {
+        return new QGeoRoutingManagerEngineMapbox(parameters, error, errorString);
+    } else {
+        *error = QGeoServiceProvider::MissingRequiredParameterError;
+        *errorString = tr("Mapbox plugin requires 'mapbox.access_token' parameters.\n"
+                          "Please visit https://www.mapbox.com");
+        return 0;
+    }
 }
 
 QPlaceManagerEngine *QGeoServiceProviderFactoryMapbox::createPlaceManagerEngine(

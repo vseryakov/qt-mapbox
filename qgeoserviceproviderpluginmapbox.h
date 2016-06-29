@@ -3,6 +3,8 @@
 ** Copyright (C) 2014 Canonical Ltd.
 ** Contact: http://www.qt.io/licensing/
 **
+** Developed by Vlad Seryakov <vseryakov@gmail.com>
+**
 ** This file is part of the QtLocation module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL3$
