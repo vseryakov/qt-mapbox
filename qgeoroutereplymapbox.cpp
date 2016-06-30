@@ -54,16 +54,31 @@ static QList<QGeoCoordinate> parsePolyline(const QString &line)
     QList<QGeoCoordinate> path;
     QByteArray data(line.toLocal8Bit());
 
-    int mode = 0, shift = 0, value = 0, coord[2] = { 0, 0};
+    int mode = 0, shift = 0, value = 0, coord[2] = {0, 0};
     for (int i = 0; i < data.length(); ++i) {
         int c = data.at(i) - 63;
         value |= (c & 0x1f) << shift;
         shift += 5;
         if (c & 0x20) continue;
         coord[mode] += (value & 1) ? ~(value >> 1) : (value >> 1);
-        if (mode) path.append(QGeoCoordinate(coord[0]/1e5, coord[1]/1e5));
+        if (mode) path.append(QGeoCoordinate((double)coord[0]/1e5, (double)coord[1]/1e5));
         mode = 1 - mode;
         value = shift = 0;
+    }
+    return path;
+}
+
+static QList<QGeoCoordinate> parseGeometry(const QJsonValue &geometry)
+{
+    QList<QGeoCoordinate> path;
+    if (geometry.isString()) path = parsePolyline(geometry.toString());
+    if (geometry.isObject()) {
+        QJsonArray coords = geometry.toObject().value(QStringLiteral("coordinates")).toArray();
+        for (int i = 0; i < coords.count(); i++) {
+            QJsonArray coord = coords.at(i).toArray();
+            if (coord.count() != 2) continue;
+            path.append(QGeoCoordinate(coord.at(1).toDouble(), coord.at(0).toDouble()));
+        }
     }
     return path;
 }
@@ -100,7 +115,7 @@ static QGeoRoute constructRoute(const QJsonObject &obj)
     route.setDistance(obj.value(QStringLiteral("distance")).toDouble());
     route.setTravelTime(obj.value(QStringLiteral("duration")).toDouble());
 
-    QList<QGeoCoordinate> path = parsePolyline(obj.value(QStringLiteral("geometry")).toString());
+    QList<QGeoCoordinate> path = parseGeometry(obj.value(QStringLiteral("geometry")));
     route.setPath(path);
 
     QGeoRouteSegment firstSegment, lastSegment;
@@ -150,7 +165,7 @@ static QGeoRoute constructRoute(const QJsonObject &obj)
                 maneuver.setDirection(QGeoManeuver::NoDirection);
 
             segment.setManeuver(maneuver);
-            segment.setPath(parsePolyline(step.value(QStringLiteral("geometry")).toString()));
+            segment.setPath(parseGeometry(step.value(QStringLiteral("geometry"))));
 
             if (!firstSegment.isValid()) firstSegment = segment;
             if (lastSegment.isValid()) lastSegment.setNextRouteSegment(segment);

@@ -90,7 +90,7 @@ QGeoRouteReply* QGeoRoutingManagerEngineMapbox::calculateRoute(const QGeoRouteRe
         url += QString("%1,%2;").arg(c.longitude()).arg(c.latitude());
     }
     if (url.right(1) == ";") url.chop(1);
-    url += QString("?steps=true&overview=full&geometries=polyline&access_token=%1").arg(m_accessToken);
+    url += QString("?steps=true&overview=full&geometries=geojson&access_token=%1").arg(m_accessToken);
 
     networkRequest.setUrl(QUrl(url));
 
